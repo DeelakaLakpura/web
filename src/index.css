@@ -1,0 +1,32 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #4CAF50;
+  --color-primary-dark: #45A049;
+  --color-sage: #8BC34A;
+  --color-sage-light: #C5E1A5;
+  --color-earth: #D7CCC8;
+  --color-taupe: #BCAAA4;
+  --color-background: #FAFAFA;
+  --color-text: #2E2E2E;
+}
+
+* {
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+a[href*="magicpatterns.com"] {
+  display: none !important;
+}
+.close-btn[aria-label="Close Magic Patterns Badge"] {
+  display: none !important;
+}
