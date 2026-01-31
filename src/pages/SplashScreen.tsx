@@ -59,7 +59,7 @@ export function SplashScreen() {
             duration: 0.6
           }}>
 
-          Farm to Table, Fresh to You
+          Banquet Food Waste Reduction
         </motion.p>
 
         <motion.div
