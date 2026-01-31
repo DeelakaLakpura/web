@@ -59,28 +59,28 @@ interface MenuItem {
 
 const menuItemsData: Record<MenuTypeLocal, MenuItem[]> = {
   breakfast: [
-    { id: 'b1', name: 'Pancakes & Eggs', description: 'Fluffy pancakes with scrambled eggs', icon: '🥞' },
-    { id: 'b2', name: 'French Toast', description: 'Golden brown French toast with syrup', icon: '🍞' },
-    { id: 'b3', name: 'Oatmeal Bowl', description: 'Creamy oatmeal with fresh berries', icon: '🥣' },
-    { id: 'b4', name: 'Bacon & Toast', description: 'Crispy bacon with buttered toast', icon: '🥓' },
+  { id: 'b1', name: 'Menu 01', description: '', icon: '' },
+    { id: 'b2', name: 'Menu 02', description: '', icon: '' },
+    { id: 'b3', name: 'Menu 03', description: '', icon: '' },
+    { id: 'b4', name: 'Menu 04', description: '', icon: '' },
   ],
   lunch: [
-    { id: 'l1', name: 'Grilled Chicken', description: 'Tender grilled chicken with vegetables', icon: '🍗' },
-    { id: 'l2', name: 'Caesar Salad', description: 'Fresh Caesar salad with croutons', icon: '🥗' },
-    { id: 'l3', name: 'Biryani', description: 'Fragrant basmati rice with spices', icon: '🍛' },
-    { id: 'l4', name: 'Sandwich', description: 'Gourmet sandwich with fresh ingredients', icon: '🥪' },
+  { id: 'b1', name: 'Menu 01', description: '', icon: '' },
+    { id: 'b2', name: 'Menu 02', description: '', icon: '' },
+    { id: 'b3', name: 'Menu 03', description: '', icon: '' },
+    { id: 'b4', name: 'Menu 04', description: '', icon: '' },
   ],
   dinner: [
-    { id: 'd1', name: 'Grilled Fish', description: 'Fresh grilled fish with lemon sauce', icon: '🐟' },
-    { id: 'd2', name: 'Steak', description: 'Premium cut steak with garlic butter', icon: '🥩' },
-    { id: 'd3', name: 'Pasta Carbonara', description: 'Creamy pasta with bacon and cheese', icon: '🍝' },
-    { id: 'd4', name: 'Roasted Lamb', description: 'Tender roasted lamb with herbs', icon: '🍖' },
+  { id: 'b1', name: 'Menu 01', description: '', icon: '' },
+    { id: 'b2', name: 'Menu 02', description: '', icon: '' },
+    { id: 'b3', name: 'Menu 03', description: '', icon: '' },
+    { id: 'b4', name: 'Menu 04', description: '', icon: '' },
   ],
   snacks: [
-    { id: 's1', name: 'Samosa', description: 'Crispy samosa with mint chutney', icon: '🥟' },
-    { id: 's2', name: 'Pakora', description: 'Golden fried vegetable pakora', icon: '🍤' },
-    { id: 's3', name: 'Cheese Board', description: 'Selection of cheeses and crackers', icon: '🧀' },
-    { id: 's4', name: 'Spring Rolls', description: 'Crispy spring rolls with sweet sauce', icon: '🌶️' },
+  { id: 'b1', name: 'Menu 01', description: '', icon: '' },
+    { id: 'b2', name: 'Menu 02', description: '', icon: '' },
+    { id: 'b3', name: 'Menu 03', description: '', icon: '' },
+    { id: 'b4', name: 'Menu 04', description: '', icon: '' },
   ],
 }
 
