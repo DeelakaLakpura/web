@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   PlusIcon,
@@ -27,6 +28,8 @@ type Menu = {
   ingredients: Ingredient[];
 };
 export function SettingsPage() {
+  const location = useLocation();
+  const hideManagerSections = (location as any)?.state?.hideManagerSections;
   const [menus, setMenus] = useState<Menu[]>([]);
   const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
   const [newMenuType, setNewMenuType] = useState<MenuType>('breakfast');
@@ -35,6 +38,32 @@ export function SettingsPage() {
   const [newIngredientQuantity, setNewIngredientQuantity] = useState('');
   const [isAddingMenu, setIsAddingMenu] = useState(false);
   const [isAddingIngredient, setIsAddingIngredient] = useState(false);
+  // Manager-only tools state
+  type Section = {
+    id: string;
+    title: string;
+    description?: string;
+  };
+  type FoodRule = {
+    id: string;
+    name: string;
+    rule: string;
+  };
+  type IngredientCost = {
+    id: string;
+    name: string;
+    cost: number;
+  };
+  const [sections, setSections] = useState<Section[]>([]);
+  const [newSectionTitle, setNewSectionTitle] = useState('');
+  const [newSectionDesc, setNewSectionDesc] = useState('');
+  const [foodRules, setFoodRules] = useState<FoodRule[]>([]);
+  const [newFoodRuleName, setNewFoodRuleName] = useState('');
+  const [newFoodRuleRule, setNewFoodRuleRule] = useState('');
+  const [ingredientCosts, setIngredientCosts] = useState<IngredientCost[]>([]);
+  const [newIngredientCostName, setNewIngredientCostName] = useState('');
+  const [newIngredientCostValue, setNewIngredientCostValue] = useState('');
+  const isManagerRoute = location.pathname.startsWith('/manager');
   const menuTypes = [
   {
     value: 'breakfast',
@@ -111,6 +140,31 @@ export function SettingsPage() {
     );
     setMenus(updatedMenus);
   };
+  // Manager-only handlers
+  const handleAddSection = () => {
+    if (!newSectionTitle) return;
+    const s: Section = { id: Date.now().toString(), title: newSectionTitle, description: newSectionDesc };
+    setSections([...sections, s]);
+    setNewSectionTitle('');
+    setNewSectionDesc('');
+  };
+  const handleDeleteSection = (id: string) => setSections(sections.filter((s) => s.id !== id));
+  const handleAddFoodRule = () => {
+    if (!newFoodRuleName || !newFoodRuleRule) return;
+    const r: FoodRule = { id: Date.now().toString(), name: newFoodRuleName, rule: newFoodRuleRule };
+    setFoodRules([...foodRules, r]);
+    setNewFoodRuleName('');
+    setNewFoodRuleRule('');
+  };
+  const handleDeleteFoodRule = (id: string) => setFoodRules(foodRules.filter((r) => r.id !== id));
+  const handleAddIngredientCost = () => {
+    if (!newIngredientCostName || !newIngredientCostValue) return;
+    const c: IngredientCost = { id: Date.now().toString(), name: newIngredientCostName, cost: Number(newIngredientCostValue) };
+    setIngredientCosts([...ingredientCosts, c]);
+    setNewIngredientCostName('');
+    setNewIngredientCostValue('');
+  };
+  const handleDeleteIngredientCost = (id: string) => setIngredientCosts(ingredientCosts.filter((c) => c.id !== id));
   return (
     <div className="min-h-screen w-full bg-[#FAFAFA] pb-24">
       <motion.div
@@ -215,11 +269,10 @@ export function SettingsPage() {
               <div className="flex justify-between items-center mb-3">
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-green-100 text-green-600">
-                    {menuTypes.
-                  find((mt) => mt.value === menu.type)?.
-                  icon({
-                    size: 20
-                  })}
+                    {(() => {
+                      const IconComp = menuTypes.find((mt) => mt.value === menu.type)?.icon;
+                      return IconComp ? <IconComp size={20} /> : null;
+                    })()}
                   </div>
                   <div>
                     <h3 className="font-semibold text-[#2E2E2E]">
@@ -345,7 +398,59 @@ export function SettingsPage() {
           )}
         </div>
 
-        <ManagerBottomNav />
+        {isManagerRoute && !hideManagerSections && (
+        <div className="mb-6">
+        
+
+          <div className="bg-white rounded-xl shadow-lg p-4 mb-4">
+            <h3 className="font-medium text-sm text-gray-700 mb-2">Define Food Rule</h3>
+            <div className="space-y-2">
+              {foodRules.map((r) => (
+                <div key={r.id} className="flex justify-between items-center p-2 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="text-sm font-medium">{r.name}</p>
+                    <p className="text-xs text-gray-500">{r.rule}</p>
+                  </div>
+                  <button onClick={() => handleDeleteFoodRule(r.id)} className="p-1 text-gray-400 hover:text-red-500">
+                    <Trash2Icon size={16} />
+                  </button>
+                </div>
+              ))}
+              <input className="w-full border rounded-lg p-2 text-sm" placeholder="Rule name" value={newFoodRuleName} onChange={(e) => setNewFoodRuleName(e.target.value)} />
+              <input className="w-full border rounded-lg p-2 text-sm" placeholder="Rule expression (e.g., max 5 items)" value={newFoodRuleRule} onChange={(e) => setNewFoodRuleRule(e.target.value)} />
+              <motion.button onClick={handleAddFoodRule} className="w-full flex items-center justify-center gap-2 py-2 bg-[#4CAF50] text-white rounded-lg text-sm font-medium" whileTap={{ scale: 0.98 }}>
+                <SaveIcon size={16} />
+                Save Rule
+              </motion.button>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg p-4 mb-4">
+            <h3 className="font-medium text-sm text-gray-700 mb-2">Ingredient Cost</h3>
+            <div className="space-y-2">
+              {ingredientCosts.map((c) => (
+                <div key={c.id} className="flex justify-between items-center p-2 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="text-sm font-medium">{c.name}</p>
+                    <p className="text-xs text-gray-500">${c.cost.toFixed(2)} per kg</p>
+                  </div>
+                  <button onClick={() => handleDeleteIngredientCost(c.id)} className="p-1 text-gray-400 hover:text-red-500">
+                    <Trash2Icon size={16} />
+                  </button>
+                </div>
+              ))}
+              <input className="w-full border rounded-lg p-2 text-sm" placeholder="Ingredient name" value={newIngredientCostName} onChange={(e) => setNewIngredientCostName(e.target.value)} />
+              <input type="number" step="0.01" className="w-full border rounded-lg p-2 text-sm" placeholder="Cost per kg" value={newIngredientCostValue} onChange={(e) => setNewIngredientCostValue(e.target.value)} />
+              <motion.button onClick={handleAddIngredientCost} className="w-full flex items-center justify-center gap-2 py-2 bg-[#4CAF50] text-white rounded-lg text-sm font-medium" whileTap={{ scale: 0.98 }}>
+                <SaveIcon size={16} />
+                Save Cost
+              </motion.button>
+            </div>
+          </div>
+        </div>
+        )}
+
+        {!((location as any)?.state?.hideBottomNav) && <ManagerBottomNav />}
       </motion.div>
     </div>);
 

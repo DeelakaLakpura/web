@@ -13,6 +13,7 @@ import {
   UsersIcon,
   ChefHatIcon,
   PlusIcon,
+  SettingsIcon,
   ScaleIcon,
   PackageIcon } from
 'lucide-react';
@@ -67,6 +68,7 @@ type Prediction = {
 
 export function ExecutiveChefDashboard() {
   const navigate = useNavigate();
+  const [eventTab, setEventTab] = useState<'pending' | 'approved' | 'rejected'>('pending');
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showQuantityModal, setShowQuantityModal] = useState(false);
   const [selectedPrediction, setSelectedPrediction] = useState<string | null>(
@@ -74,6 +76,7 @@ export function ExecutiveChefDashboard() {
   );
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [rejectReason, setRejectReason] = useState('');
+  const [itemComments, setItemComments] = useState<{ [key: string]: string }>({});
   const [events, setEvents] = useState<Event[]>([
   {
     id: '1',
@@ -170,8 +173,242 @@ export function ExecutiveChefDashboard() {
 
     }]
 
-  }]
+  },
+  // Sample Approved events (3..7)
+  {
+    id: '3',
+    title: 'Approved Gala 1',
+    date: '2024-02-10',
+    guests: 150,
+    type: 'other',
+    mealType: 'dinner',
+    status: 'confirmed',
+    totalEstimatedQuantity: 0,
+    totalCalculatedQuantity: 0,
+    menuItems: [
+      {
+        id: 'a1',
+        name: 'Beef Wellington',
+        category: 'main',
+        portionSize: 220,
+        wasteFactor: 8,
+        estimatedQuantity: 30,
+        calculatedQuantity: 0,
+        ingredients: [{ name: 'Beef', quantityPerServing: 150, unit: 'g' }]
+      }
+    ]
+  },
+  {
+    id: '4',
+    title: 'Approved Gala 2',
+    date: '2024-02-12',
+    guests: 120,
+    type: 'other',
+    mealType: 'dinner',
+    status: 'confirmed',
+    totalEstimatedQuantity: 0,
+    totalCalculatedQuantity: 0,
+    menuItems: [
+      {
+        id: 'a2',
+        name: 'Roasted Lamb',
+        category: 'main',
+        portionSize: 200,
+        wasteFactor: 10,
+        estimatedQuantity: 25,
+        calculatedQuantity: 0,
+        ingredients: [{ name: 'Lamb', quantityPerServing: 140, unit: 'g' }]
+      }
+    ]
+  },
+  {
+    id: '5',
+    title: 'Approved Gala 3',
+    date: '2024-02-14',
+    guests: 200,
+    type: 'wedding',
+    mealType: 'dinner',
+    status: 'confirmed',
+    totalEstimatedQuantity: 0,
+    totalCalculatedQuantity: 0,
+    menuItems: [
+      {
+        id: 'a3',
+        name: 'Seared Tuna',
+        category: 'main',
+        portionSize: 180,
+        wasteFactor: 7,
+        estimatedQuantity: 36,
+        calculatedQuantity: 0,
+        ingredients: [{ name: 'Tuna', quantityPerServing: 130, unit: 'g' }]
+      }
+    ]
+  },
+  {
+    id: '6',
+    title: 'Approved Gala 4',
+    date: '2024-02-16',
+    guests: 80,
+    type: 'corporate',
+    mealType: 'lunch',
+    status: 'confirmed',
+    totalEstimatedQuantity: 0,
+    totalCalculatedQuantity: 0,
+    menuItems: [
+      {
+        id: 'a4',
+        name: 'Pasta Primavera',
+        category: 'main',
+        portionSize: 200,
+        wasteFactor: 5,
+        estimatedQuantity: 16,
+        calculatedQuantity: 0,
+        ingredients: [{ name: 'Pasta', quantityPerServing: 100, unit: 'g' }]
+      }
+    ]
+  },
+  {
+    id: '7',
+    title: 'Approved Gala 5',
+    date: '2024-02-18',
+    guests: 60,
+    type: 'other',
+    mealType: 'dinner',
+    status: 'confirmed',
+    totalEstimatedQuantity: 0,
+    totalCalculatedQuantity: 0,
+    menuItems: [
+      {
+        id: 'a5',
+        name: 'Vegetable Tart',
+        category: 'main',
+        portionSize: 150,
+        wasteFactor: 6,
+        estimatedQuantity: 9,
+        calculatedQuantity: 0,
+        ingredients: [{ name: 'Vegetables', quantityPerServing: 90, unit: 'g' }]
+      }
+    ]
+  },
+  // Sample Rejected events (8..12)
+  {
+    id: '8',
+    title: 'Rejected Event 1',
+    date: '2024-03-01',
+    guests: 140,
+    type: 'wedding',
+    mealType: 'dinner',
+    status: 'planning',
+    totalEstimatedQuantity: 0,
+    totalCalculatedQuantity: 0,
+    menuItems: [
+      {
+        id: 'r1',
+        name: 'Fried Fish',
+        category: 'main',
+        portionSize: 180,
+        wasteFactor: 12,
+        estimatedQuantity: 28,
+        calculatedQuantity: 0,
+        ingredients: [{ name: 'Fish', quantityPerServing: 120, unit: 'g' }]
+      }
+    ]
+  },
+  {
+    id: '9',
+    title: 'Rejected Event 2',
+    date: '2024-03-05',
+    guests: 90,
+    type: 'corporate',
+    mealType: 'lunch',
+    status: 'planning',
+    totalEstimatedQuantity: 0,
+    totalCalculatedQuantity: 0,
+    menuItems: [
+      {
+        id: 'r2',
+        name: 'Chicken Skewers',
+        category: 'main',
+        portionSize: 160,
+        wasteFactor: 10,
+        estimatedQuantity: 14,
+        calculatedQuantity: 0,
+        ingredients: [{ name: 'Chicken', quantityPerServing: 100, unit: 'g' }]
+      }
+    ]
+  },
+  {
+    id: '10',
+    title: 'Rejected Event 3',
+    date: '2024-03-08',
+    guests: 220,
+    type: 'other',
+    mealType: 'buffet',
+    status: 'planning',
+    totalEstimatedQuantity: 0,
+    totalCalculatedQuantity: 0,
+    menuItems: [
+      {
+        id: 'r3',
+        name: 'Mixed Grill',
+        category: 'main',
+        portionSize: 200,
+        wasteFactor: 15,
+        estimatedQuantity: 44,
+        calculatedQuantity: 0,
+        ingredients: [{ name: 'Meats', quantityPerServing: 140, unit: 'g' }]
+      }
+    ]
+  },
+  {
+    id: '11',
+    title: 'Rejected Event 4',
+    date: '2024-03-12',
+    guests: 50,
+    type: 'birthday',
+    mealType: 'lunch',
+    status: 'planning',
+    totalEstimatedQuantity: 0,
+    totalCalculatedQuantity: 0,
+    menuItems: [
+      {
+        id: 'r4',
+        name: 'Mini Burgers',
+        category: 'main',
+        portionSize: 120,
+        wasteFactor: 8,
+        estimatedQuantity: 6,
+        calculatedQuantity: 0,
+        ingredients: [{ name: 'Beef', quantityPerServing: 60, unit: 'g' }]
+      }
+    ]
+  },
+  {
+    id: '12',
+    title: 'Rejected Event 5',
+    date: '2024-03-15',
+    guests: 300,
+    type: 'corporate',
+    mealType: 'buffet',
+    status: 'planning',
+    totalEstimatedQuantity: 0,
+    totalCalculatedQuantity: 0,
+    menuItems: [
+      {
+        id: 'r5',
+        name: 'Buffet Selection',
+        category: 'main',
+        portionSize: 210,
+        wasteFactor: 12,
+        estimatedQuantity: 63,
+        calculatedQuantity: 0,
+        ingredients: [{ name: 'Assorted', quantityPerServing: 140, unit: 'g' }]
+      }
+    ]
+  }
+  ]
   );
+
 
   const [predictions, setPredictions] = useState<Prediction[]>([
   {
@@ -225,7 +462,100 @@ export function ExecutiveChefDashboard() {
 
     confidence: 78,
     status: 'pending'
-  }]
+  },
+  // Approved predictions for events 3..7
+  {
+    id: '4',
+    eventId: '3',
+    title: 'Approved Suggestion 1',
+    prediction: 'Slight reduction recommended for Beef Wellington',
+    evidence: ['Past events showed 6% waste'],
+    confidence: 85,
+    status: 'approved'
+  },
+  {
+    id: '5',
+    eventId: '4',
+    title: 'Approved Suggestion 2',
+    prediction: 'Roasted Lamb quantities look good',
+    evidence: ['Supplier availability stable'],
+    confidence: 80,
+    status: 'approved'
+  },
+  {
+    id: '6',
+    eventId: '5',
+    title: 'Approved Suggestion 3',
+    prediction: 'Seared Tuna estimate aligns with consumption',
+    evidence: ['Similar menu consumed fully'],
+    confidence: 82,
+    status: 'approved'
+  },
+  {
+    id: '7',
+    eventId: '6',
+    title: 'Approved Suggestion 4',
+    prediction: 'Pasta quantities are sufficient',
+    evidence: ['Lunch service historically lighter'],
+    confidence: 76,
+    status: 'approved'
+  },
+  {
+    id: '8',
+    eventId: '7',
+    title: 'Approved Suggestion 5',
+    prediction: 'Vegetable Tart estimate matches guest profile',
+    evidence: ['Vegetarian uptake high'],
+    confidence: 79,
+    status: 'approved'
+  },
+  // Rejected predictions for events 8..12
+  {
+    id: '9',
+    eventId: '8',
+    title: 'Rejected Suggestion 1',
+    prediction: 'Reduce fried fish quantities by 20%',
+    evidence: ['Local preference showed more fish consumption'],
+    confidence: 60,
+    status: 'rejected'
+  },
+  {
+    id: '10',
+    eventId: '9',
+    title: 'Rejected Suggestion 2',
+    prediction: 'Lower chicken skewers estimate',
+    evidence: ['RSVPs show more vegetarians'],
+    confidence: 65,
+    status: 'rejected'
+  },
+  {
+    id: '11',
+    eventId: '10',
+    title: 'Rejected Suggestion 3',
+    prediction: 'Cut mixed grill by 10%',
+    evidence: ['Previous buffet consumption high'],
+    confidence: 58,
+    status: 'rejected'
+  },
+  {
+    id: '12',
+    eventId: '11',
+    title: 'Rejected Suggestion 4',
+    prediction: 'Reduce mini burgers',
+    evidence: ['Kids count higher than expected'],
+    confidence: 55,
+    status: 'rejected'
+  },
+  {
+    id: '13',
+    eventId: '12',
+    title: 'Rejected Suggestion 5',
+    prediction: 'Lower buffet selection',
+    evidence: ['Corporate events usually consume more'],
+    confidence: 62,
+    status: 'rejected'
+  }
+  ]
   );
 
   useEffect(() => {
@@ -349,31 +679,64 @@ export function ExecutiveChefDashboard() {
   };
 
   const handleViewQuantities = (event: Event) => {
-    setSelectedEvent(event);
+    // clone the event so modal edits don't mutate list directly
+    const clonedEvent: Event = JSON.parse(JSON.stringify(event));
+
+    // set each estimate to the calculated value so both show the same initially
+    clonedEvent.menuItems = clonedEvent.menuItems.map((item) => ({
+      ...item,
+      estimatedQuantity: item.calculatedQuantity
+    }));
+    clonedEvent.totalEstimatedQuantity = Math.round(
+      clonedEvent.menuItems.reduce((s, it) => s + it.estimatedQuantity, 0) * 10
+    ) / 10;
+
+    setSelectedEvent(clonedEvent);
     setShowQuantityModal(true);
   };
 
   const handleManualAdjustment = (itemId: string, newQuantity: number) => {
     if (!selectedEvent) return;
 
+    // Update events list as well so other parts of the app remain in sync
     const updatedEvents = events.map((event) =>
-    event.id === selectedEvent.id ?
-    {
-      ...event,
-      menuItems: event.menuItems.map((item) =>
-      item.id === itemId ?
-      { ...item, estimatedQuantity: newQuantity } :
-      item
-      ),
-      totalEstimatedQuantity: event.menuItems.reduce(
-        (sum, item) => sum + (item.id === itemId ? newQuantity : item.estimatedQuantity),
-        0
-      )
-    } :
-    event
+      event.id === selectedEvent.id
+        ? {
+            ...event,
+            menuItems: event.menuItems.map((item) =>
+              item.id === itemId ? { ...item, estimatedQuantity: newQuantity } : item
+            ),
+            totalEstimatedQuantity: Math.round(
+              event.menuItems.reduce(
+                (sum, item) => sum + (item.id === itemId ? newQuantity : item.estimatedQuantity),
+                0
+              ) * 10
+            ) / 10
+          }
+        : event
     );
 
     setEvents(updatedEvents);
+
+    // Update the selectedEvent shown in the modal so the UI updates immediately
+    setSelectedEvent((prev) => {
+      if (!prev) return prev;
+      const updated = { ...prev } as Event;
+      updated.menuItems = updated.menuItems.map((m) =>
+        m.id === itemId ? { ...m, estimatedQuantity: newQuantity } : m
+      );
+      updated.totalEstimatedQuantity = Math.round(
+        updated.menuItems.reduce((s, it) => s + it.estimatedQuantity, 0) * 10
+      ) / 10;
+      return updated;
+    });
+  };
+
+  const handleCommentChange = (itemId: string, comment: string) => {
+    setItemComments((prev) => ({
+      ...prev,
+      [itemId]: comment
+    }));
   };
 
   const getStatusBadge = (status: Prediction['status']) => {
@@ -412,7 +775,7 @@ export function ExecutiveChefDashboard() {
   return (
     <div className="min-h-screen w-full bg-[#FAFAFA] pb-8">
       <motion.div
-        className="max-w-md mx-auto p-6"
+        className="max-w-md mx-auto p-6 relative"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}>
@@ -422,6 +785,14 @@ export function ExecutiveChefDashboard() {
           label="Go to Kitchen Staff"
           to="/kitchen-staff"
           icon={<UtensilsIcon size={18} />} />
+
+        <button
+          aria-label="Open settings"
+          onClick={() => navigate('/manager/settings', { state: { hideBottomNav: true, hideManagerSections: true } })}
+          className="absolute top-4 right-4 p-2 rounded-full bg-white shadow-md hover:bg-gray-100 z-50"
+        >
+          <SettingsIcon size={16} className="text-gray-700" />
+        </button>
 
 
         {/* Header */}
@@ -437,13 +808,49 @@ export function ExecutiveChefDashboard() {
 
         {/* Events List */}
         <div className="mb-8">
-          <h2 className="font-semibold text-[#2E2E2E] mb-4 flex items-center gap-2">
-            <CalendarIcon size={18} className="text-[#4CAF50]" />
-            Upcoming Events
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-semibold text-[#2E2E2E] flex items-center gap-2">
+              <CalendarIcon size={18} className="text-[#4CAF50]" />
+              Upcoming Events
+            </h2>
+            <div className="flex items-center gap-2">
+              {/* Tabs: Pending / Approved / Rejected */}
+              <div className="inline-flex bg-white rounded-lg shadow-sm p-1">
+                <button
+                  onClick={() => setEventTab('pending')}
+                  className={`px-3 py-1 text-sm rounded-md ${eventTab === 'pending' ? 'bg-[#E6F4EA] text-[#2E7D32]' : 'text-gray-600'}`}
+                >
+                  Pending
+                </button>
+                <button
+                  onClick={() => setEventTab('approved')}
+                  className={`px-3 py-1 text-sm rounded-md ${eventTab === 'approved' ? 'bg-[#E8F5E9] text-[#2E7D32]' : 'text-gray-600'}`}
+                >
+                  Approved
+                </button>
+                <button
+                  onClick={() => setEventTab('rejected')}
+                  className={`px-3 py-1 text-sm rounded-md ${eventTab === 'rejected' ? 'bg-[#FFF3E0] text-[#BF360C]' : 'text-gray-600'}`}
+                >
+                  Rejected
+                </button>
+              </div>
+            </div>
+          </div>
           <div className="space-y-3">
-            {events.map((event, index) =>
-            <motion.div
+            {events
+              .filter((event) => {
+                // show events that have related predictions matching the selected tab
+                return predictions.some((p) =>
+                  p.eventId === event.id && (
+                    (eventTab === 'approved' && (p.status === 'approved' || p.status === 'updated')) ||
+                    (eventTab === 'pending' && p.status === 'pending') ||
+                    (eventTab === 'rejected' && p.status === 'rejected')
+                  )
+                );
+              })
+              .map((event, index) =>
+              <motion.div
               key={event.id}
               className="bg-white rounded-xl shadow-lg p-4"
               initial={{ opacity: 0, y: 10 }}
@@ -483,170 +890,16 @@ export function ExecutiveChefDashboard() {
                   variant="secondary"
                   onClick={() => handleViewQuantities(event)}
                   className="flex-1 text-sm">
-
-                    <ScaleIcon size={14} className="mr-1" />
-                    View Quantities
+                    Plan  Quantities
                   </Button>
-                  <Button
-                  variant="outline"
-                  onClick={() => navigate(`/event-planner/${event.id}`)}
-                  className="flex-1 text-sm">
-
-                    <ChefHatIcon size={14} className="mr-1" />
-                    Plan Menu
-                  </Button>
+               
                 </div>
               </motion.div>
             )}
           </div>
         </div>
 
-        {/* AI Predictions */}
-        <h2 className="font-semibold text-[#2E2E2E] mb-4 flex items-center gap-2">
-          <LightbulbIcon size={18} className="text-amber-500" />
-          AI Quantity Predictions
-        </h2>
-        
-        <div className="space-y-4">
-          {predictions.map((prediction, index) => {
-            const relatedEvent = prediction.eventId ?
-            events.find((e) => e.id === prediction.eventId) :
-            null;
 
-            return (
-              <motion.div
-                key={prediction.id}
-                className="bg-white rounded-xl shadow-lg p-5"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}>
-
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <LightbulbIcon size={18} className="text-amber-500" />
-                    <h3 className="font-semibold text-[#2E2E2E]">
-                      {prediction.title}
-                    </h3>
-                  </div>
-                  {getStatusBadge(prediction.status)}
-                </div>
-
-                {relatedEvent &&
-                <div className="mb-3 p-2 bg-blue-50 rounded-lg">
-                    <p className="text-xs text-blue-600">
-                      Event: {relatedEvent.title} • {relatedEvent.guests} guests
-                    </p>
-                  </div>
-                }
-
-                <p className="text-gray-700 text-sm mb-4">
-                  {prediction.prediction}
-                </p>
-
-                {/* Quantity Adjustments */}
-                {prediction.suggestedChanges &&
-                <div className="mb-4 bg-amber-50 rounded-lg p-3">
-                    <p className="text-xs font-medium text-amber-700 mb-2">
-                      Suggested Quantity Adjustments:
-                    </p>
-                    {relatedEvent && prediction.suggestedChanges.menuItems.map((adjustment, i) => {
-                    const menuItem = relatedEvent.menuItems.find(
-                      (item) => item.id === adjustment.itemId
-                    );
-                    return menuItem ?
-                    <div key={i} className="flex items-center justify-between mb-1">
-                          <span className="text-xs text-gray-600">
-                            {menuItem.name}
-                          </span>
-                          <span className={`text-xs font-medium ${
-                      adjustment.adjustment > 0 ? 'text-green-600' : 'text-red-600'}`
-                      }>
-                            {adjustment.adjustment > 0 ? '+' : ''}{adjustment.adjustment}%
-                          </span>
-                        </div> :
-                    null;
-                  })}
-                    <div className="mt-2 pt-2 border-t border-amber-200">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-gray-600">Total Adjustment</span>
-                        <span className={`text-sm font-bold ${
-                      prediction.suggestedChanges.totalAdjustment > 0 ? 'text-green-600' : 'text-red-600'}`
-                      }>
-                          {prediction.suggestedChanges.totalAdjustment > 0 ? '+' : ''}
-                          {prediction.suggestedChanges.totalAdjustment}%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                }
-
-                {/* Confidence Bar */}
-                <div className="mb-4">
-                  <div className="flex justify-between text-xs text-gray-500 mb-1">
-                    <span>AI Confidence</span>
-                    <span>{prediction.confidence}%</span>
-                  </div>
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <motion.div
-                      className="h-full bg-gradient-to-r from-[#4CAF50] to-[#8BC34A]"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${prediction.confidence}%` }}
-                      transition={{ delay: 0.3, duration: 0.5 }} />
-
-                  </div>
-                </div>
-
-                {/* Evidence */}
-                <div className="bg-gray-50 rounded-lg p-3 mb-4">
-                  <p className="text-xs font-medium text-gray-500 mb-2">
-                    Supporting Evidence:
-                  </p>
-                  <ul className="space-y-1">
-                    {prediction.evidence.map((item, i) =>
-                    <li
-                      key={i}
-                      className="text-xs text-gray-600 flex items-start gap-2">
-
-                        <span className="text-[#4CAF50] mt-0.5">•</span>
-                        {item}
-                      </li>
-                    )}
-                  </ul>
-                </div>
-
-                {/* Action Buttons */}
-                {prediction.status === 'pending' &&
-                <div className="flex gap-2">
-                    <motion.button
-                    onClick={() => handleApprove(prediction.id)}
-                    className="flex-1 flex items-center justify-center gap-1 py-2.5 bg-green-500 text-white rounded-lg text-sm font-medium"
-                    whileTap={{ scale: 0.97 }}>
-
-                      <CheckCircleIcon size={16} />
-                      Approve
-                    </motion.button>
-                    <motion.button
-                    onClick={() => handleRejectClick(prediction.id)}
-                    className="flex-1 flex items-center justify-center gap-1 py-2.5 bg-red-500 text-white rounded-lg text-sm font-medium"
-                    whileTap={{ scale: 0.97 }}>
-
-                      <XCircleIcon size={16} />
-                      Reject
-                    </motion.button>
-                    <motion.button
-                    onClick={() => handleUpdate(prediction.id)}
-                    className="flex-1 flex items-center justify-center gap-1 py-2.5 bg-amber-500 text-white rounded-lg text-sm font-medium"
-                    whileTap={{ scale: 0.97 }}>
-
-                      <EditIcon size={16} />
-                      Update
-                    </motion.button>
-                  </div>
-                }
-              </motion.div>);
-
-          })}
-        </div>
       </motion.div>
 
       {/* Quantity Details Modal */}
@@ -660,7 +913,7 @@ export function ExecutiveChefDashboard() {
           onClick={() => setShowQuantityModal(false)}>
 
             <motion.div
-            className="bg-white w-full max-w-md rounded-t-3xl p-6 max-h-[80vh] overflow-y-auto"
+            className="bg-white w-full max-w-md rounded-t-3xl p-6 max-h-[80vh] overflow-y-auto hide-scrollbar"
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
@@ -752,6 +1005,21 @@ export function ExecutiveChefDashboard() {
                       </div>
                     </div>
 
+                    {/* Comment Section - show only if estimate differs from calculated */}
+                    {item.estimatedQuantity !== item.calculatedQuantity && (
+                      <div className="mb-3 bg-blue-50 rounded-lg p-3">
+                        <p className="text-xs font-medium text-blue-600 mb-2">
+                          Add Comment (Optional)
+                        </p>
+                        <textarea
+                          value={itemComments[item.id] || ''}
+                          onChange={(e) => handleCommentChange(item.id, e.target.value)}
+                          placeholder="Add a note about this adjustment..."
+                          className="w-full h-16 px-2 py-2 text-xs border border-blue-200 rounded bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none resize-none" />
+
+                      </div>
+                    )}
+
                     {/* Ingredients */}
                     <div className="mt-2 pt-2 border-t border-gray-100">
                       <p className="text-xs font-medium text-gray-500 mb-1">
@@ -779,10 +1047,95 @@ export function ExecutiveChefDashboard() {
               )}
               </div>
 
+              {/* AI Predictions for this Event */}
+              {predictions.filter((p) => p.eventId === selectedEvent.id).length > 0 && (
+                <div className="mt-6 pt-6 border-t border-gray-200 space-y-4">
+                  <h4 className="font-medium text-[#2E2E2E] flex items-center gap-2">
+                    <LightbulbIcon size={16} className="text-amber-500" />
+                    AI Quantity Predictions
+                  </h4>
+
+                  {predictions
+                    .filter((p) => p.eventId === selectedEvent.id)
+                    .map((prediction) => (
+                      <motion.div
+                        key={prediction.id}
+                        className="bg-amber-50 rounded-lg p-4"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}>
+
+                        <div className="flex items-start justify-between mb-2">
+                          <h5 className="font-semibold text-[#2E2E2E] text-sm">
+                            {prediction.title}
+                          </h5>
+                          {getStatusBadge(prediction.status)}
+                        </div>
+
+                        <p className="text-gray-700 text-xs mb-3">
+                          {prediction.prediction}
+                        </p>
+
+                        {/* Quantity Adjustments */}
+                        {prediction.suggestedChanges && (
+                          <div className="mb-3 bg-white rounded p-2">
+                            <p className="text-xs font-medium text-amber-700 mb-2">
+                              Suggested Adjustments:
+                            </p>
+                            {prediction.suggestedChanges.menuItems.map((adjustment, i) => {
+                              const menuItem = selectedEvent.menuItems.find(
+                                (item) => item.id === adjustment.itemId
+                              );
+                              return menuItem ? (
+                                <div key={i} className="flex items-center justify-between mb-1">
+                                  <span className="text-xs text-gray-600">
+                                    {menuItem.name}
+                                  </span>
+                                  <span
+                                    className={`text-xs font-medium ${
+                                      adjustment.adjustment > 0
+                                        ? 'text-green-600'
+                                        : 'text-red-600'
+                                    }`}>
+                                    {adjustment.adjustment > 0 ? '+' : ''}
+                                    {adjustment.adjustment}%
+                                  </span>
+                                </div>
+                              ) : null;
+                            })}
+                          </div>
+                        )}
+
+                        {/* Confidence Bar */}
+                        <div className="mb-3">
+                          <div className="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>Confidence</span>
+                            <span>{prediction.confidence}%</span>
+                          </div>
+                          <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                            <motion.div
+                              className="h-full bg-gradient-to-r from-amber-400 to-amber-500"
+                              initial={{ width: 0 }}
+                              animate={{ width: `${prediction.confidence}%` }}
+                              transition={{ delay: 0.2, duration: 0.4 }}
+                            />
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                </div>
+              )}
+
               <div className="mt-6 pt-4 border-t border-gray-200">
                 <Button
                 variant="primary"
                 onClick={() => {
+                  if (!selectedEvent) return;
+
+                  // Persist the edited event back into the events list
+                  setEvents((prev) =>
+                    prev.map((e) => (e.id === selectedEvent.id ? selectedEvent : e))
+                  );
+
                   // Save to localStorage for manager dashboard
                   const plannedEvents = JSON.parse(localStorage.getItem('plannedEvents') || '[]');
                   const existingIndex = plannedEvents.findIndex((e: Event) => e.id === selectedEvent.id);

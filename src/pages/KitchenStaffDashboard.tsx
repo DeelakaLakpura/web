@@ -9,7 +9,13 @@ import {
   Sun,
   Utensils,
   Moon,
-  Wine } from
+  Wine,
+  CheckCircle2,
+  Circle,
+  ChevronDown,
+  ChevronUp,
+  ChefHatIcon
+} from
 'lucide-react';
 import { TopNavButton } from '../components/TopNavButton';
 import { Button } from '../components/Button';
@@ -42,15 +48,54 @@ const menuTypes = [
 { value: 'dinner', label: 'Dinner', icon: Utensils }] as
 const;
 
+type MenuTypeLocal = 'breakfast' | 'lunch' | 'dinner' | 'snacks'
+
+interface MenuItem {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+}
+
+const menuItemsData: Record<MenuTypeLocal, MenuItem[]> = {
+  breakfast: [
+    { id: 'b1', name: 'Pancakes & Eggs', description: 'Fluffy pancakes with scrambled eggs', icon: '🥞' },
+    { id: 'b2', name: 'French Toast', description: 'Golden brown French toast with syrup', icon: '🍞' },
+    { id: 'b3', name: 'Oatmeal Bowl', description: 'Creamy oatmeal with fresh berries', icon: '🥣' },
+    { id: 'b4', name: 'Bacon & Toast', description: 'Crispy bacon with buttered toast', icon: '🥓' },
+  ],
+  lunch: [
+    { id: 'l1', name: 'Grilled Chicken', description: 'Tender grilled chicken with vegetables', icon: '🍗' },
+    { id: 'l2', name: 'Caesar Salad', description: 'Fresh Caesar salad with croutons', icon: '🥗' },
+    { id: 'l3', name: 'Biryani', description: 'Fragrant basmati rice with spices', icon: '🍛' },
+    { id: 'l4', name: 'Sandwich', description: 'Gourmet sandwich with fresh ingredients', icon: '🥪' },
+  ],
+  dinner: [
+    { id: 'd1', name: 'Grilled Fish', description: 'Fresh grilled fish with lemon sauce', icon: '🐟' },
+    { id: 'd2', name: 'Steak', description: 'Premium cut steak with garlic butter', icon: '🥩' },
+    { id: 'd3', name: 'Pasta Carbonara', description: 'Creamy pasta with bacon and cheese', icon: '🍝' },
+    { id: 'd4', name: 'Roasted Lamb', description: 'Tender roasted lamb with herbs', icon: '🍖' },
+  ],
+  snacks: [
+    { id: 's1', name: 'Samosa', description: 'Crispy samosa with mint chutney', icon: '🥟' },
+    { id: 's2', name: 'Pakora', description: 'Golden fried vegetable pakora', icon: '🍤' },
+    { id: 's3', name: 'Cheese Board', description: 'Selection of cheeses and crackers', icon: '🧀' },
+    { id: 's4', name: 'Spring Rolls', description: 'Crispy spring rolls with sweet sauce', icon: '🌶️' },
+  ],
+}
+
 const reasonOptions: {value: WastageReason;label: string;}[] = [
 { value: 'overproduction', label: 'Overproduction' },
 { value: 'expiry', label: 'Expiry' },
 { value: 'preparation_issues', label: 'Preparation Issues' }];
+// include 'other' so a textarea appears when selected
+reasonOptions.push({ value: 'other', label: 'Other' });
 
 
 /* ================= MOCK APPROVED PLAN ================= */
 
 const approvedPlan = {
+  id: 'plan-1',
   title: 'Lunch Service Plan',
   date: 'Today, Jan 26',
   status: 'updated',
@@ -74,6 +119,12 @@ export function KitchenStaffDashboard() {
   const [wastageLog, setWastageLog] = useState<WastageEntry[]>([]);
   const [showSuccess, setShowSuccess] = useState(false);
   const [menuType, setMenuType] = useState<MenuType | null>(null);
+  const [selectedMenuItems, setSelectedMenuItems] = useState<string[]>([]);
+  const [expandMenuItems, setExpandMenuItems] = useState(true);
+  const [activeTab, setActiveTab] = useState<'pending' | 'completed'>('pending');
+  const [pendingPlans, setPendingPlans] = useState<any[]>([approvedPlan]);
+  const [completedPlans, setCompletedPlans] = useState<any[]>([]);
+  const [approvedPlanState, setApprovedPlanState] = useState<typeof approvedPlan | null>(null);
 
   /* ================= EFFECTS ================= */
 
@@ -99,6 +150,8 @@ export function KitchenStaffDashboard() {
   /* ================= HELPERS ================= */
 
   const selectedMenu = menuTypes.find((m) => m.value === menuType);
+
+  // removed default mapping so menu items don't show until a menu type is selected
 
   const syncOfflineData = () => {
     const stored = localStorage.getItem('wastageLog');
@@ -143,6 +196,17 @@ export function KitchenStaffDashboard() {
     setTimeout(() => setShowSuccess(false), 2000);
   };
 
+  const markPlanDone = (id: string) => {
+    const plan = pendingPlans.find((p) => p.id === id);
+    if (!plan) return;
+    setPendingPlans((prev) => prev.filter((p) => p.id !== id));
+    setCompletedPlans((prev) => [plan, ...prev]);
+    setApprovedPlanState(plan);
+    setActiveTab('completed');
+    // ensure menu type cleared for new plan interaction
+    setMenuType(null);
+  };
+
   /* ================= UI ================= */
 
   return (
@@ -178,7 +242,58 @@ export function KitchenStaffDashboard() {
           </div>
         </div>
 
-        {/* ================= APPROVED PLAN ================= */}
+        {/* ================= PENDING / COMPLETED TABS ================= */}
+        <div className="bg-white rounded-xl shadow-lg p-5 mb-4">
+          <div className="flex gap-2 mb-4">
+            <button
+              className={`px-3 py-1 rounded-full text-sm font-medium ${activeTab === 'pending' ? 'bg-green-50 text-green-600' : 'bg-gray-100'}`}
+              onClick={() => setActiveTab('pending')}>
+              Pending
+            </button>
+            <button
+              className={`px-3 py-1 rounded-full text-sm font-medium ${activeTab === 'completed' ? 'bg-green-50 text-green-600' : 'bg-gray-100'}`}
+              onClick={() => setActiveTab('completed')}>
+              Completed
+            </button>
+          </div>
+
+          {activeTab === 'pending' ? (
+            <div className="space-y-3">
+              {pendingPlans.length === 0 && <p className="text-xs text-gray-500">No pending plans</p>}
+              {pendingPlans.map((p) => (
+                <div key={p.id} className="flex justify-between items-center">
+                  <div>
+                    <div className="font-semibold">{p.title}</div>
+                    <div className="text-xs text-gray-500">{p.date}</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      className="px-3 py-1 bg-green-500 text-white rounded-md text-sm"
+                      onClick={() => markPlanDone(p.id)}>
+                      Done
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {completedPlans.length === 0 && <p className="text-xs text-gray-500">No completed plans</p>}
+              {completedPlans.map((p) => (
+                <div key={p.id} className="flex justify-between items-center">
+                  <div>
+                    <div className="font-semibold">{p.title}</div>
+                    <div className="text-xs text-gray-500">{p.date}</div>
+                  </div>
+                  <div className="text-sm text-green-600">Approved</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ================= APPROVED PLAN (shows after marking Done) ================= */}
+        {approvedPlanState && (
         <div className="bg-white rounded-xl shadow-lg p-5 mb-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
@@ -190,19 +305,19 @@ export function KitchenStaffDashboard() {
             </span>
           </div>
 
-          <p className="text-xs text-gray-500 mb-3">{approvedPlan.date}</p>
+          <p className="text-xs text-gray-500 mb-3">{approvedPlanState.date}</p>
 
           {/* Menu Type Section */}
           <div className="flex justify-between items-center py-2 border-b border-gray-100 mb-2">
             <span className="text-sm font-medium text-gray-700">Menu Type</span>
             <span className="text-sm font-semibold text-green-600">
-              {approvedPlan.menuType}
+              {approvedPlanState.menuType}
             </span>
           </div>
 
           {/* Items Section */}
           <div className="space-y-2">
-            {approvedPlan.items.map((item, i) =>
+            {approvedPlanState.items.map((item: any, i: number) => (
             <div
               key={i}
               className="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
@@ -212,10 +327,13 @@ export function KitchenStaffDashboard() {
                   {item.quantity} Kg
                 </span>
               </div>
-            )}
+            ))}
           </div>
-        </div>
+        </div>)}
 
+        {/* Show menu selection and wastage logging only after a plan is approved */}
+        {approvedPlanState && (
+        <>
         {/* ================= MENU TYPE ================= */}
         <div className="bg-white rounded-xl shadow-lg p-5 mb-4">
           <p className="text-sm font-medium mb-3">Select Menu Type</p>
@@ -242,6 +360,97 @@ export function KitchenStaffDashboard() {
             })}
           </div>
         </div>
+
+        {/* ================= MENU ITEMS (Banquet-style) ================= */}
+   <div className="bg-white rounded-xl shadow-lg p-5 mb-4">
+  {menuType && (
+    <>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-medium text-[#2E2E2E] flex items-center gap-2">
+          <ChefHatIcon size={18} className="text-[#4CAF50]" />
+          {menuType.charAt(0).toUpperCase() + menuType.slice(1)} Menu Items
+        </h3>
+
+        <motion.button
+          onClick={() => setExpandMenuItems(!expandMenuItems)}
+          className="text-[#4CAF50] hover:bg-[#E8F5E9] p-2 rounded-lg transition-colors"
+          whileTap={{ scale: 0.95 }}
+        >
+          {expandMenuItems ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+        </motion.button>
+      </div>
+
+      {/* Expandable menu list */}
+      {expandMenuItems && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.3 }}
+          className="space-y-2"
+        >
+          {menuItemsData[menuType as MenuTypeLocal].map((item) => (
+            <motion.div
+              key={item.id}
+              onClick={() =>
+                setSelectedMenuItems((prev) =>
+                  prev.includes(item.id)
+                    ? prev.filter((id) => id !== item.id)
+                    : [...prev, item.id]
+                )
+              }
+              className={`p-3 rounded-lg border-2 cursor-pointer transition-all flex items-start gap-3 ${
+                selectedMenuItems.includes(item.id)
+                  ? 'border-[#4CAF50] bg-[#E8F5E9]'
+                  : 'border-gray-100 bg-gray-50 hover:border-gray-200'
+              }`}
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="mt-1">
+                {selectedMenuItems.includes(item.id) ? (
+                  <CheckCircle2 size={20} className="text-[#4CAF50]" />
+                ) : (
+                  <Circle size={20} className="text-gray-300" />
+                )}
+              </div>
+
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{item.icon}</span>
+                  <span
+                    className={`font-medium text-sm ${
+                      selectedMenuItems.includes(item.id)
+                        ? 'text-[#2E7D32]'
+                        : 'text-[#2E2E2E]'
+                    }`}
+                  >
+                    {item.name}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  {item.description}
+                </p>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
+
+      {/* Selected count */}
+      {selectedMenuItems.length > 0 && (
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          <p className="text-xs text-gray-600">
+            <span className="font-medium text-[#4CAF50]">
+              {selectedMenuItems.length}
+            </span>{' '}
+            item(s) selected
+          </p>
+        </div>
+      )}
+    </>
+  )}
+</div>
 
         {/* ================= LOG WASTAGE ================= */}
         <div className="bg-white rounded-xl shadow-lg p-5 mb-4">
@@ -319,6 +528,8 @@ export function KitchenStaffDashboard() {
             Log Wastage
           </Button>
         </div>
+        </>
+        )}
 
         {/* ================= RECENT LOGS ================= */}
         {wastageLog.length > 0 &&
