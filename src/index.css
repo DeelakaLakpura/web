@@ -30,3 +30,12 @@ a[href*="magicpatterns.com"] {
 .close-btn[aria-label="Close Magic Patterns Badge"] {
   display: none !important;
 }
+/* Hide scrollbar for all elements with scrollbar-hide class */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
