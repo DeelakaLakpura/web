@@ -98,8 +98,11 @@ const approvedPlan = {
   id: 'plan-1',
   title: 'Lunch Service Plan',
   date: 'Today, Jan 26',
-  status: 'updated',
+  status: 'Approved',
   menuType: 'Lunch', // Added menuType
+  customerName: 'John Doe',
+  adultCount: 32,
+  childCount: 5,
   items: [
   { name: 'Grilled Chicken', quantity: 45 },
   { name: 'Vegetable Curry', quantity: 30 },
@@ -125,6 +128,8 @@ export function KitchenStaffDashboard() {
   const [pendingPlans, setPendingPlans] = useState<any[]>([approvedPlan]);
   const [completedPlans, setCompletedPlans] = useState<any[]>([]);
   const [approvedPlanState, setApprovedPlanState] = useState<typeof approvedPlan | null>(null);
+  const [showPlanModal, setShowPlanModal] = useState(false);
+  const [activePlan, setActivePlan] = useState<any | null>(null);
 
   /* ================= EFFECTS ================= */
 
@@ -207,6 +212,18 @@ export function KitchenStaffDashboard() {
     setMenuType(null);
   };
 
+  const handleApproveFromModal = (id: string) => {
+    markPlanDone(id);
+    setShowPlanModal(false);
+    setActivePlan(null);
+  };
+
+  const handleRejectFromModal = (id: string) => {
+    setPendingPlans((prev) => prev.filter((p) => p.id !== id));
+    setShowPlanModal(false);
+    setActivePlan(null);
+  };
+
   /* ================= UI ================= */
 
   return (
@@ -242,6 +259,56 @@ export function KitchenStaffDashboard() {
           </div>
         </div>
 
+        {/* Plan Modal */}
+        {showPlanModal && activePlan && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div
+              className="absolute inset-0 bg-black/40"
+              onClick={() => {
+                setShowPlanModal(false);
+                setActivePlan(null);
+              }}
+            />
+
+            <div className="bg-white rounded-xl shadow-xl w-11/12 max-w-md p-5 z-10">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <h3 className="font-semibold">{activePlan.title}</h3>
+                  <p className="text-xs text-gray-500">{activePlan.date}</p>
+                </div>
+                <div className="text-xs text-amber-600">{activePlan.status}</div>
+              </div>
+
+              <div className="text-sm text-gray-700 mb-3">
+                <div className="mb-2"><span className="font-medium">Customer:</span> {activePlan.customerName || '—'}</div>
+                <div className="mb-2"><span className="font-medium">Guests:</span> {activePlan.adultCount ?? 0} adult(s), {activePlan.childCount ?? 0} child(ren)</div>
+              </div>
+
+              <div className="space-y-2 mb-4">
+                {activePlan.items?.map((it: any, i: number) => (
+                  <div key={i} className="flex justify-between text-sm">
+                    <div>{it.name}</div>
+                    <div className="font-medium">{it.quantity} Kg</div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleApproveFromModal(activePlan.id)}
+                  className="flex-1 px-4 py-2 bg-green-500 text-white rounded-md">
+                  Done
+                </button>
+                <button
+                  onClick={() => handleRejectFromModal(activePlan.id)}
+                  className="flex-1 px-4 py-2 bg-red-100 text-red-700 rounded-md">
+                  Reject
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ================= PENDING / COMPLETED TABS ================= */}
         <div className="bg-white rounded-xl shadow-lg p-5 mb-4">
           <div className="flex gap-2 mb-4">
@@ -261,18 +328,19 @@ export function KitchenStaffDashboard() {
             <div className="space-y-3">
               {pendingPlans.length === 0 && <p className="text-xs text-gray-500">No pending plans</p>}
               {pendingPlans.map((p) => (
-                <div key={p.id} className="flex justify-between items-center">
+                <div
+                  key={p.id}
+                  className="flex justify-between items-center cursor-pointer p-2 rounded hover:bg-gray-50"
+                  onClick={() => {
+                    setActivePlan(p);
+                    setShowPlanModal(true);
+                  }}
+                >
                   <div>
                     <div className="font-semibold">{p.title}</div>
                     <div className="text-xs text-gray-500">{p.date}</div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      className="px-3 py-1 bg-green-500 text-white rounded-md text-sm"
-                      onClick={() => markPlanDone(p.id)}>
-                      Done
-                    </button>
-                  </div>
+                  <div className="text-xs text-gray-400">View</div>
                 </div>
               ))}
             </div>
@@ -301,11 +369,27 @@ export function KitchenStaffDashboard() {
               <h3 className="font-semibold">Approved Plan</h3>
             </div>
             <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full">
-              Updated
+              Approved
             </span>
           </div>
 
           <p className="text-xs text-gray-500 mb-3">{approvedPlanState.date}</p>
+
+          {/* Customer Details Section */}
+          <div className="flex justify-between items-center py-2 border-b border-gray-100 mb-2">
+            <span className="text-sm font-medium text-gray-700">Customer</span>
+            <span className="text-sm font-semibold text-gray-800">
+              {approvedPlanState.customerName || '—'}
+            </span>
+          </div>
+
+          {/* Guest Count Section */}
+          <div className="flex justify-between items-center py-2 border-b border-gray-100 mb-2">
+            <span className="text-sm font-medium text-gray-700">Guests</span>
+            <span className="text-sm font-semibold text-gray-800">
+              {approvedPlanState.adultCount ?? 0} adult(s), {approvedPlanState.childCount ?? 0} child(ren)
+            </span>
+          </div>
 
           {/* Menu Type Section */}
           <div className="flex justify-between items-center py-2 border-b border-gray-100 mb-2">
